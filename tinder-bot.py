@@ -13,6 +13,11 @@ class TinderBot():
 
         sleep(2)
 
+        accept_cookies_btn = self.driver.find_element_by_xpath('/html/body/div[1]/div/div[2]/div/div/div[1]/button')
+        accept_cookies_btn.click()
+
+        sleep(2)
+
         fb_btn = self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div/div/div[3]/div[2]/button')
         fb_btn.click()
 
