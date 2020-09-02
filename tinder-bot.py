@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common import keys
 from time import sleep
 
 from secrets import username, password
@@ -6,7 +7,11 @@ from secrets import username, password
 
 class TinderBot():
     def __init__(self):
-        self.driver = webdriver.Chrome()
+        caps = webdriver.DesiredCapabilities.CHROME.copy()
+        caps['acceptInsecureCerts'] = True
+        caps['enableNetwork'] = True
+        self.driver = webdriver.Chrome(desired_capabilities=caps)
+        self.action = webdriver.ActionChains(self.driver)
 
     def login(self):
         self.driver.get('https://tinder.com')
@@ -18,8 +23,10 @@ class TinderBot():
 
         sleep(2)
 
-        fb_btn = self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div/div/div[3]/div[2]/button')
-        fb_btn.click()
+        fb_login_btn = self.driver.find_element_by_xpath('/html/body/div[2]/div/div/div[1]/div/div[3]/span/div[2]/button')
+        fb_login_btn.click()
+
+        sleep(2)
 
         # switch to login popup
         base_window = self.driver.window_handles[0]
@@ -34,27 +41,35 @@ class TinderBot():
         login_btn = self.driver.find_element_by_xpath('//*[@id="u_0_0"]')
         login_btn.click()
 
+        sleep(5)
+
         self.driver.switch_to.window(base_window)
 
-        popup_1 = self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div/div/div[3]/button[1]')
-        popup_1.click()
+        sleep(2)
 
-        popup_2 = self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div/div/div[3]/button[1]')
-        popup_2.click()
+        enable_location_btn = self.driver.find_element_by_xpath('/html/body/div[2]/div/div/div/div/div[3]/button[1]')
+        enable_location_btn.click()
+
+        sleep(2)
+
+        self.driver.execute_cdp_cmd("Emulation.setGeolocationOverride", {
+            "latitude": 52.379189,
+            "longitude": 4.899431,
+            "accuracy": 100
+        })
+
+        disable_notifications_btn = self.driver.find_element_by_xpath('/html/body/div[2]/div/div/div/div/div[3]/button[2]')
+        disable_notifications_btn.click()
+
+        sleep(15)
 
     def like(self):
-        like_btn = self.driver.find_element_by_xpath(
-            '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/button[3]')
-        like_btn.click()
-
-    def dislike(self):
-        dislike_btn = self.driver.find_element_by_xpath(
-            '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/button[1]')
-        dislike_btn.click()
+        self.action.send_keys(keys.Keys.ARROW_RIGHT)
+        self.action.perform()
 
     def auto_swipe(self):
         while True:
-            sleep(0.5)
+            sleep(1)
             try:
                 self.like()
             except Exception:
@@ -64,7 +79,7 @@ class TinderBot():
                     self.close_match()
 
     def close_popup(self):
-        popup_3 = self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div[2]/button[2]')
+        popup_3 = self.driver.find_element_by_xpath('/html/body/div[2]/div/div/div[2]/button[2]')
         popup_3.click()
 
     def close_match(self):
@@ -74,3 +89,4 @@ class TinderBot():
 
 bot = TinderBot()
 bot.login()
+bot.auto_swipe()
