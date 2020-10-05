@@ -5,7 +5,7 @@ from time import sleep
 from secrets import username, password
 
 
-class TinderBot():
+class TinderBot:
     def __init__(self):
         caps = webdriver.DesiredCapabilities.CHROME.copy()
         caps['acceptInsecureCerts'] = True
